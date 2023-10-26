@@ -3336,7 +3336,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx_1,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -3586,7 +3586,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx_3,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -3831,7 +3831,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx_1,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -3843,7 +3843,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx_3,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -4179,7 +4179,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -4291,7 +4291,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -4421,7 +4421,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -4581,7 +4581,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -4606,7 +4606,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -4753,7 +4753,7 @@ mod openssl_tests {
                 max_cred_num,
                 BTreeSet::new(),
                 revoked.clone(),
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -4779,7 +4779,7 @@ mod openssl_tests {
                 max_cred_num,
                 revoked.clone(),
                 BTreeSet::new(),
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -5005,7 +5005,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 rev_idx,
                 max_cred_num,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             )
             .unwrap();
@@ -5613,7 +5613,7 @@ mod openssl_tests {
                 &mut rev_reg,
                 max_cred_num,
                 rev_idx,
-                &credential_pub_key,
+                &credential_pub_key.get_revocation_key().unwrap(),
                 &rev_key_priv,
             );
             // assert_eq!(

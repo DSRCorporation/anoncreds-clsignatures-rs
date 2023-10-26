@@ -2304,7 +2304,7 @@ mod tests {
             max_cred_num,
             issued,
             BTreeSet::new(),
-            &cred_pub_key,
+            &cred_pub_key.get_revocation_key().unwrap(),
             &rev_key_priv,
         )
         .expect("Error updating revocation registry");

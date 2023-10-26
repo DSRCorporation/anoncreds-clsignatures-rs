@@ -537,13 +537,13 @@ impl Issuer {
     ///                                        false,
     ///                                        &mut rev_reg,
     ///                                        &rev_key_priv).unwrap();
-    /// Issuer::revoke_credential(&mut rev_reg, max_cred_num, rev_idx, &cred_pub_key, &rev_key_priv).unwrap();
+    /// Issuer::revoke_credential(&mut rev_reg, max_cred_num, rev_idx, &cred_pub_key.get_revocation_key().unwrap(), &rev_key_priv).unwrap();
     /// ```
     pub fn revoke_credential(
         rev_reg: &mut RevocationRegistry,
         max_cred_num: u32,
         rev_idx: u32,
-        credential_pub_key: &CredentialPublicKey,
+        rev_key_pub: &CredentialRevocationPublicKey,
         rev_key_priv: &RevocationKeyPrivate,
     ) -> ClResult<RevocationRegistryDelta> {
         trace!(
@@ -558,7 +558,7 @@ impl Issuer {
             prev_accum,
             max_cred_num,
             [(rev_idx, true)],
-            credential_pub_key,
+            rev_key_pub,
             rev_key_priv,
         )?;
         let rev_reg_delta = RevocationRegistryDelta {
@@ -636,14 +636,14 @@ impl Issuer {
     ///                                        false,
     ///                                        &mut rev_reg,
     ///                                        &rev_key_priv).unwrap();
-    /// Issuer::revoke_credential(&mut rev_reg, max_cred_num, rev_idx, &cred_pub_key, &rev_key_priv).unwrap();
-    /// Issuer::unrevoke_credential(&mut rev_reg, max_cred_num, rev_idx, &cred_pub_key, &rev_key_priv).unwrap();
+    /// Issuer::revoke_credential(&mut rev_reg, max_cred_num, rev_idx, &cred_pub_key.get_revocation_key().unwrap(), &rev_key_priv).unwrap();
+    /// Issuer::unrevoke_credential(&mut rev_reg, max_cred_num, rev_idx, &cred_pub_key.get_revocation_key().unwrap(), &rev_key_priv).unwrap();
     /// ```
     pub fn unrevoke_credential(
         rev_reg: &mut RevocationRegistry,
         max_cred_num: u32,
         rev_idx: u32,
-        credential_pub_key: &CredentialPublicKey,
+        rev_key_pub: &CredentialRevocationPublicKey,
         rev_key_priv: &RevocationKeyPrivate,
     ) -> ClResult<RevocationRegistryDelta> {
         trace!(
@@ -658,7 +658,7 @@ impl Issuer {
             prev_accum,
             max_cred_num,
             [(rev_idx, false)],
-            credential_pub_key,
+            rev_key_pub,
             rev_key_priv,
         )?;
         let rev_reg_delta = RevocationRegistryDelta {
@@ -740,14 +740,14 @@ impl Issuer {
     /// let mut issued = BTreeSet::new();
     /// issued.insert(rev_idx);
     /// let revoked = BTreeSet::new();
-    /// Issuer::update_revocation_registry(&mut rev_reg, max_cred_num, issued, revoked, &cred_pub_key, &rev_key_priv).unwrap();
+    /// Issuer::update_revocation_registry(&mut rev_reg, max_cred_num, issued, revoked, &cred_pub_key.get_revocation_key().unwrap(), &rev_key_priv).unwrap();
     /// ```
     pub fn update_revocation_registry(
         rev_reg: &mut RevocationRegistry,
         max_cred_num: u32,
         issued: BTreeSet<u32>,
         revoked: BTreeSet<u32>,
-        credential_pub_key: &CredentialPublicKey,
+        rev_key_pub: &CredentialRevocationPublicKey,
         rev_key_priv: &RevocationKeyPrivate,
     ) -> ClResult<RevocationRegistryDelta> {
         trace!(
@@ -766,7 +766,7 @@ impl Issuer {
                 .iter()
                 .map(|idx| (*idx, false))
                 .chain(revoked.iter().map(|idx| (*idx, true))),
-            credential_pub_key,
+            rev_key_pub,
             rev_key_priv,
         )?;
 
@@ -789,14 +789,9 @@ impl Issuer {
         accum: Accumulator,
         max_cred_num: u32,
         updates: impl IntoIterator<Item = (u32, bool)>,
-        credential_pub_key: &CredentialPublicKey,
+        rev_key_pub: &CredentialRevocationPublicKey,
         rev_key_priv: &RevocationKeyPrivate,
     ) -> ClResult<Accumulator> {
-        let rev_key_pub: &CredentialRevocationPublicKey =
-            credential_pub_key.r_key.as_ref().ok_or_else(|| {
-                err_msg!("No revocation part present in credential revocation public key.")
-            })?;
-
         let mut pow_acc = GroupOrderElement::zero()?;
         for (rev_idx, remove) in updates {
             let index = Self::_get_index(max_cred_num, rev_idx);
