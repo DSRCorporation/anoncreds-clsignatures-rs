@@ -1,13 +1,15 @@
 use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
 
+use failure::Fail;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum ErrorKind {
     InvalidState,
     ProofRejected,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Fail)]
 pub struct Error(ErrorKind, Cow<'static, str>);
 
 impl Error {
