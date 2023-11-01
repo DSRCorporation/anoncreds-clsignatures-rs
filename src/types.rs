@@ -10,6 +10,7 @@ use crate::amcl::*;
 use crate::bn::BigNumber;
 use crate::error::Result as ClResult;
 use crate::helpers;
+use crate::helpers::{big_numbers_map_to_bytes, big_numbers_to_bytes};
 
 /// A list of attributes a Credential is based on.
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -844,6 +845,20 @@ impl CredentialSignature {
             r_credential: self.r_credential.as_ref().cloned(),
         })
     }
+
+    pub fn to_bytes(&self) -> ClResult<Vec<u8>> {
+        let parts = vec![
+            &self.p_credential.m_2,
+            &self.p_credential.a,
+            &self.p_credential.e,
+            &self.p_credential.v,
+        ];
+
+        let mut entries = big_numbers_to_bytes(parts)?;
+        entries.extend(0u16.to_be_bytes());
+
+        return Ok(entries);
+    }
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -891,6 +906,14 @@ impl SignatureCorrectnessProof {
             se: self.se.try_clone()?,
             c: self.c.try_clone()?,
         })
+    }
+
+    pub fn to_bytes(&self) -> ClResult<Vec<u8>> {
+        let parts = vec![&self.se, &self.c,];
+
+        let entries= big_numbers_to_bytes(parts)?;
+
+        return Ok(entries);
     }
 }
 
@@ -1281,6 +1304,25 @@ pub struct PrimaryEqualProof {
     pub(crate) m2: BigNumber,
 }
 
+impl PrimaryEqualProof {
+    pub fn to_bytes(&self) -> ClResult<Vec<u8>> {
+        let parts = vec![
+            &self.a_prime,
+            &self.e,
+            &self.v,
+        ];
+
+        let mut entries: Vec<u8> = big_numbers_to_bytes(parts)?;
+
+        let entry = big_numbers_map_to_bytes(&self.m, true)?;
+        entries.extend(entry);
+
+        let entry = big_numbers_to_bytes(vec![&self.m2])?;
+        entries.extend(entry);
+
+        return Ok(entries);
+    }
+}
 #[cfg(feature = "serde")]
 impl<'a> ::serde::de::Deserialize<'a> for PrimaryEqualProof {
     fn deserialize<D: ::serde::de::Deserializer<'a>>(deserializer: D) -> Result<Self, D::Error> {
@@ -1322,6 +1364,27 @@ pub struct PrimaryPredicateInequalityProof {
     pub(crate) predicate: Predicate,
 }
 
+impl PrimaryPredicateInequalityProof {
+    pub fn to_bytes(&self) -> ClResult<Vec<u8>> {
+        let mut entries =  big_numbers_map_to_bytes(&self.u, false)?;
+
+        let entry = big_numbers_map_to_bytes(&self.r, false)?;
+        entries.extend(entry);
+
+        let parts = vec![
+            &self.mj,
+            &self.alpha,
+        ];
+
+        let entry = big_numbers_to_bytes(parts)?;
+        entries.extend(entry);
+
+        let entry = big_numbers_map_to_bytes(&self.t, false)?;
+        entries.extend(entry);
+
+        return Ok(entries);
+    }
+}
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug)]
 pub struct NonRevocProof {

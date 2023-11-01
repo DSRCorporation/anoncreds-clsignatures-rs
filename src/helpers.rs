@@ -706,6 +706,43 @@ pub fn new_nonce() -> ClResult<Nonce> {
     bn_rand(crate::constants::LARGE_NONCE)
 }
 
+pub fn big_numbers_to_bytes(list: Vec<&BigNumber>) -> ClResult<Vec<u8>> {
+    let mut entries: Vec<u8> = vec![];
+
+    for value in list {
+        let entry = value.to_bytes()?;
+        let len = (entry.len() as u16).to_be_bytes();
+
+        entries.extend(len);
+        entries.extend(entry);
+    }
+
+    Ok(entries)
+}
+
+pub fn big_numbers_map_to_bytes(map: &HashMap<String, BigNumber>, include_key: bool) -> ClResult<Vec<u8>> {
+    let mut entries: Vec<u8> = vec![];
+
+    for (key, value) in map {
+        let entry: Vec<u8>;
+        let len: u16;
+
+        if include_key {
+            let attr = key.clone().into_bytes();
+            entry = value.to_bytes()?;
+            len = (attr.len() + entry.len()) as u16;
+
+        } else {
+            entry = value.to_bytes()?;
+            len = entry.len() as u16;
+        }
+
+        entries.extend(len.to_be_bytes());
+        entries.extend(entry);
+    }
+
+    Ok(entries)
+}
 #[cfg(test)]
 mod tests {
     use super::*;
